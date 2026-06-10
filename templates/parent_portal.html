@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SERS – Parent Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f0fafa; font-weight: 300; }
+    .nav { background: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0f5f5; position: sticky; top: 0; z-index: 50; }
+    .logo-wrap { display: flex; align-items: center; gap: 12px; }
+    .logo-3d { width: 44px; height: 44px; background: linear-gradient(145deg, #0d9488, #14b8a6); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 5px 0 #0f766e, 0 8px 16px rgba(13,148,136,0.25); }
+    .logo-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: #0f4f4f; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 9px; color: #5eead4; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; }
+    .nav-r { display: flex; align-items: center; gap: 12px; }
+    .back-btn { background: linear-gradient(135deg, #0d9488, #14b8a6); color: #fff; border: none; border-radius: 20px; padding: 9px 20px; font-size: 11px; font-weight: 500; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(13,148,136,0.3); text-decoration: none; display: inline-block; }
+    .clock { font-size: 11px; font-weight: 400; color: #5eead4; background: #f0fdfa; padding: 7px 14px; border-radius: 12px; letter-spacing: 0.5px; }
+    .main { padding: 0 28px 28px; max-width: 1000px; margin: 0 auto; }
+    .hero { margin: 20px 0 0; background: linear-gradient(135deg, #0d9488 0%, #14b8a6 60%, #2dd4bf 100%); border-radius: 28px; padding: 26px; overflow: hidden; position: relative; }
+    .hero-circle1 { position: absolute; right: -30px; top: -30px; width: 180px; height: 180px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; }
+    .hero-circle2 { position: absolute; right: 30px; top: 20px; width: 110px; height: 110px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; }
+    .hero-circle3 { position: absolute; left: -20px; bottom: -40px; width: 140px; height: 140px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+    .hero-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+    .hero-greeting { font-family: 'DM Serif Display', serif; font-size: 26px; color: #fff; line-height: 1.25; font-style: italic; }
+    .hero-sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 6px; font-weight: 300; letter-spacing: 0.5px; }
+    .hero-date { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 16px; padding: 7px 16px; font-size: 11px; font-weight: 500; color: #fff; letter-spacing: 0.5px; }
+    .hero-stats { display: flex; margin-top: 24px; background: rgba(255,255,255,0.12); border-radius: 20px; padding: 16px 24px; position: relative; z-index: 1; }
+    .hstat { flex: 1; text-align: center; }
+    .hstat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; line-height: 1; }
+    .hstat-lbl { font-size: 9px; color: rgba(255,255,255,0.6); font-weight: 400; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+    .hstat-div { width: 1px; background: rgba(255,255,255,0.2); margin: 0 8px; }
+    .section-title { font-size: 9px; font-weight: 500; color: #5eead4; margin: 20px 0 12px; letter-spacing: 2.5px; text-transform: uppercase; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(13,148,136,0.1); }
+    .notif-card { background: #fff; border-radius: 20px; padding: 18px 20px; border: 1px solid #e0f5f5; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 14px; }
+    .notif-card.distress { border-color: #fecaca; background: linear-gradient(135deg, #fff, #fff5f5); }
+    .notif-card.positive { border-color: #99f6e4; background: linear-gradient(135deg, #fff, #f0fdfa); }
+    .notif-emoji { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+    .notif-content { flex: 1; }
+    .notif-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+    .notif-name { font-size: 13px; font-weight: 500; color: #0f4f4f; letter-spacing: 0.2px; }
+    .notif-emotion { font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.3px; }
+    .notif-subject { font-size: 10px; font-weight: 400; color: #6b7280; background: #f0fdfa; padding: 3px 10px; border-radius: 20px; border: 1px solid #e0f5f5; }
+    .notif-msg { font-size: 12px; color: #374151; font-weight: 300; line-height: 1.6; letter-spacing: 0.2px; }
+    .notif-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .notif-time { font-size: 10px; color: #9ca3af; letter-spacing: 0.3px; }
+    .notif-status { font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.3px; }
+    .status-sent { background: #d1fae5; color: #065f46; }
+    .status-pending { background: #fef9c3; color: #713f12; }
+    .empty { text-align: center; padding: 60px 20px; }
+    .empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .empty h3 { font-family: 'DM Serif Display', serif; font-size: 20px; color: #0f4f4f; margin-bottom: 8px; font-style: italic; }
+    .empty p { font-size: 12px; color: #5eead4; font-weight: 300; letter-spacing: 0.3px; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #f0fafa; }
+    ::-webkit-scrollbar-thumb { background: #99f6e4; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="nav">
+    <div class="logo-wrap">
+      <div class="logo-3d">🧠</div>
+      <div>
+        <div class="logo-name">SERS</div>
+        <div class="logo-sub">Parent Portal</div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <a href="/" class="back-btn">🏫 Teacher Dashboard</a>
+      <div class="clock" id="current-time"></div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-circle1"></div>
+      <div class="hero-circle2"></div>
+      <div class="hero-circle3"></div>
+      <div class="hero-top">
+        <div>
+          <div class="hero-greeting">Parent Portal</div>
+          <div class="hero-sub">Your child's emotional health reports from school</div>
+        </div>
+        <div class="hero-date" id="hero-date">—</div>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat">
+          <div class="hstat-num" id="total-notif">—</div>
+          <div class="hstat-lbl">Notifications</div>
+        </div>
+        <div class="hstat-div"></div>
+        <div class="hstat">
+          <div class="hstat-num" id="distress-count">—</div>
+          <div class="hstat-lbl">Distress Alerts</div>
+        </div>
+        <div class="hstat-div"></div>
+        <div class="hstat">
+          <div class="hstat-num" id="students-count">—</div>
+          <div class="hstat-lbl">Students</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="section-title">Notification History</div>
+    <div id="notifications-list"></div>
+
+  </div>
+
+<script>
+const EMOTION_EMOJI = { happy:'😊', sad:'😢', angry:'😠', neutral:'😐', surprised:'😲', fearful:'😨', disgusted:'🤢' };
+const NEGATIVE = ['sad','angry','fearful','disgusted'];
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString('en-IN', { hour:'2-digit', minute:'2-digit', day:'numeric', month:'short', year:'numeric' });
+}
+
+function updateClock() {
+  document.getElementById('current-time').textContent =
+    new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+function updateDate() {
+  const now = new Date();
+  document.getElementById('hero-date').textContent =
+    `${DAYS[now.getDay()]} · ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+}
+
+async function loadPortal() {
+  const [notifications, students] = await Promise.all([
+    fetch('/api/parent-notifications/').then(r => r.json()),
+    fetch('/api/students/').then(r => r.json())
+  ]);
+
+  // Hero stats
+  document.getElementById('total-notif').textContent = notifications.length;
+  document.getElementById('distress-count').textContent =
+    notifications.filter(n => NEGATIVE.includes(n.emotion_trigger)).length;
+  document.getElementById('students-count').textContent = students.length;
+
+  // Notifications
+  const listEl = document.getElementById('notifications-list');
+  if (notifications.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">✅</div>
+        <h3>All is well</h3>
+        <p>No notifications yet · Your child is doing great emotionally in class!</p>
+      </div>`;
+    return;
+  }
+
+  const isNeg = n => NEGATIVE.includes(n.emotion_trigger);
+  const emotionBadgeStyle = e => {
+    const styles = {
+      angry:    'background:#fee2e2;color:#991b1b',
+      sad:      'background:#dbeafe;color:#1e40af',
+      fearful:  'background:#ede9fe;color:#4c1d95',
+      disgusted:'background:#d1fae5;color:#064e3b',
+      happy:    'background:#d1fae5;color:#065f46',
+      neutral:  'background:#f1f5f9;color:#475569',
+      surprised:'background:#fef9c3;color:#713f12',
+    };
+    return styles[e] || styles.neutral;
+  };
+
+  listEl.innerHTML = notifications.map(n => `
+    <div class="notif-card card-hover ${isNeg(n) ? 'distress' : 'positive'}">
+      <div class="notif-emoji">${EMOTION_EMOJI[n.emotion_trigger] || '😐'}</div>
+      <div class="notif-content">
+        <div class="notif-top">
+          <span class="notif-name">${n.student_name}</span>
+          <span class="notif-emotion" style="${emotionBadgeStyle(n.emotion_trigger)}">${n.emotion_trigger}</span>
+          <span class="notif-subject">📚 ${n.subject}</span>
+        </div>
+        <div class="notif-msg">${n.message}</div>
+        <div class="notif-footer">
+          <span class="notif-time">🕐 ${formatTime(n.created_at)}</span>
+          <span class="notif-status ${n.is_sent ? 'status-sent' : 'status-pending'}">
+            ${n.is_sent ? '✅ Delivered' : '⏳ Pending'}
+          </span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+updateDate();
+loadPortal();
+setInterval(loadPortal, 30000);
+</script>
+</body>
+</html>

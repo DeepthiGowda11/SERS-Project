@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SERS – Student Emotion Response System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f0fafa; font-weight: 300; }
+    .nav { background: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0f5f5; position: sticky; top: 0; z-index: 50; }
+    .logo-wrap { display: flex; align-items: center; gap: 12px; }
+    .logo-3d { width: 44px; height: 44px; background: linear-gradient(145deg, #0d9488, #14b8a6); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 5px 0 #0f766e, 0 8px 16px rgba(13,148,136,0.25); }
+    .logo-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: #0f4f4f; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 9px; color: #5eead4; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; }
+    .nav-r { display: flex; align-items: center; gap: 12px; }
+    .live-badge { display: flex; align-items: center; gap: 6px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 20px; padding: 7px 16px; font-size: 11px; font-weight: 500; color: #0d9488; letter-spacing: 0.3px; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #14b8a6; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+    .portal-btn { background: linear-gradient(135deg, #0d9488, #14b8a6); color: #fff; border: none; border-radius: 20px; padding: 9px 20px; font-size: 11px; font-weight: 500; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(13,148,136,0.3); text-decoration: none; display: inline-block; }
+    .clock { font-size: 11px; font-weight: 400; color: #5eead4; background: #f0fdfa; padding: 7px 14px; border-radius: 12px; letter-spacing: 0.5px; }
+    .main { padding: 0 28px 28px; max-width: 1400px; margin: 0 auto; }
+    .hero { margin: 20px 0 0; background: linear-gradient(135deg, #0d9488 0%, #14b8a6 60%, #2dd4bf 100%); border-radius: 28px; padding: 26px; overflow: hidden; position: relative; }
+    .hero-circle1 { position: absolute; right: -30px; top: -30px; width: 180px; height: 180px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; }
+    .hero-circle2 { position: absolute; right: 30px; top: 20px; width: 110px; height: 110px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; }
+    .hero-circle3 { position: absolute; left: -20px; bottom: -40px; width: 140px; height: 140px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+    .hero-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+    .hero-greeting { font-family: 'DM Serif Display', serif; font-size: 26px; color: #fff; line-height: 1.25; font-style: italic; }
+    .hero-sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 6px; font-weight: 300; letter-spacing: 0.5px; }
+    .hero-date { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 16px; padding: 7px 16px; font-size: 11px; font-weight: 500; color: #fff; letter-spacing: 0.5px; }
+    .hero-stats { display: flex; margin-top: 24px; background: rgba(255,255,255,0.12); border-radius: 20px; padding: 16px 24px; position: relative; z-index: 1; }
+    .hstat { flex: 1; text-align: center; }
+    .hstat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; line-height: 1; }
+    .hstat-lbl { font-size: 9px; color: rgba(255,255,255,0.6); font-weight: 400; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+    .hstat-div { width: 1px; background: rgba(255,255,255,0.2); margin: 0 8px; }
+    .ceci-card { background: #fff; border-radius: 24px; padding: 20px 24px; border: 1.5px solid #99f6e4; margin-top: 16px; position: relative; overflow: hidden; }
+    .ceci-glow { position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(20,184,166,0.08), transparent 70%); border-radius: 50%; }
+    .ceci-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .ceci-label { font-size: 11px; font-weight: 500; color: #0d9488; letter-spacing: 0.5px; }
+    .ceci-badge { font-size: 10px; font-weight: 500; padding: 4px 14px; border-radius: 10px; border: 1px solid #99f6e4; letter-spacing: 0.5px; }
+    .ceci-row { display: flex; align-items: center; gap: 20px; }
+    .ceci-num { font-family: 'DM Serif Display', serif; font-size: 48px; color: #0f4f4f; line-height: 1; }
+    .ceci-right { flex: 1; }
+    .ceci-sub { font-size: 10px; color: #5eead4; font-weight: 400; margin-bottom: 8px; letter-spacing: 0.5px; }
+    .bar-bg { height: 6px; background: #f0fdfa; border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #0d9488, #2dd4bf); transition: width 1s ease; }
+    .ceci-status { font-size: 11px; font-weight: 400; margin-top: 7px; letter-spacing: 0.3px; }
+    .section-title { font-size: 9px; font-weight: 500; color: #5eead4; margin: 20px 0 12px; letter-spacing: 2.5px; text-transform: uppercase; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .chart-card { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid #e0f5f5; }
+    .chart-h { font-size: 13px; font-weight: 500; color: #0f4f4f; margin-bottom: 14px; letter-spacing: 0.2px; }
+    .donut-wrap { display: flex; align-items: center; gap: 16px; }
+    .legend { display: flex; flex-direction: column; gap: 7px; }
+    .leg { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6b7280; font-weight: 400; letter-spacing: 0.2px; }
+    .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .sbars { display: flex; flex-direction: column; gap: 12px; }
+    .sbar-row { display: flex; align-items: center; gap: 10px; }
+    .sbar-lbl { width: 50px; font-size: 11px; color: #9ca3af; font-weight: 400; text-align: right; letter-spacing: 0.2px; }
+    .sbar-track { flex: 1; height: 8px; background: #f0fdfa; border-radius: 4px; overflow: hidden; }
+    .sbar-fill { height: 100%; border-radius: 4px; }
+    .sbar-val { width: 34px; font-size: 11px; font-weight: 500; color: #0f4f4f; letter-spacing: 0.2px; }
+    .bot-card { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid #e0f5f5; }
+    .bot-h { font-size: 13px; font-weight: 500; color: #0f4f4f; margin-bottom: 12px; letter-spacing: 0.2px; }
+    .reco-item { background: linear-gradient(135deg, #f0fdfa, #e6fffa); border: 1px solid #99f6e4; border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; font-size: 12px; color: #0d9488; font-weight: 400; line-height: 1.5; letter-spacing: 0.2px; }
+    .pred-lbl { font-size: 9px; font-weight: 500; color: #14b8a6; text-transform: uppercase; letter-spacing: 1.5px; margin: 12px 0 8px; }
+    .pred-item { background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 1px solid #bbf7d0; border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; font-size: 12px; color: #065f46; font-weight: 400; line-height: 1.5; letter-spacing: 0.2px; }
+    .alert-item { background: linear-gradient(135deg, #fff5f5, #fee2e2); border: 1px solid #fecaca; border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; }
+    .alert-name { font-size: 12px; font-weight: 500; color: #991b1b; }
+    .alert-msg { font-size: 11px; color: #dc2626; margin-top: 3px; font-weight: 300; line-height: 1.4; }
+    .alert-time { font-size: 10px; color: #fca5a5; margin-top: 4px; }
+    .empty { text-align: center; padding: 24px 10px; }
+    .empty-icon { font-size: 32px; margin-bottom: 8px; }
+    .empty p { font-size: 11px; color: #5eead4; font-weight: 400; letter-spacing: 0.3px; }
+    .tbl-card { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid #e0f5f5; }
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl th { font-size: 9px; font-weight: 500; color: #5eead4; text-align: left; padding: 0 10px 12px; text-transform: uppercase; letter-spacing: 1.5px; }
+    .tbl td { padding: 10px; font-size: 12px; color: #374151; border-top: 1px solid #f0fdfa; font-weight: 400; letter-spacing: 0.2px; }
+    .tbl tr:hover td { background: #f0fdfa; }
+    .ebadge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 400; letter-spacing: 0.2px; }
+    .avatar { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; margin-right: 8px; vertical-align: middle; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(13,148,136,0.1); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #f0fafa; }
+    ::-webkit-scrollbar-thumb { background: #99f6e4; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="nav">
+    <div class="logo-wrap">
+      <div class="logo-3d">🧠</div>
+      <div>
+        <div class="logo-name">SERS</div>
+        <div class="logo-sub">Emotion Intelligence</div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        Live Monitoring
+      </div>
+      <a href="/parents/" class="portal-btn">👨‍👩‍👧 Parent Portal</a>
+      <div class="clock" id="current-time"></div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Hero Banner -->
+    <div class="hero">
+      <div class="hero-circle1"></div>
+      <div class="hero-circle2"></div>
+      <div class="hero-circle3"></div>
+      <div class="hero-top">
+        <div>
+          <div class="hero-greeting">Good morning,<br>Teacher</div>
+          <div class="hero-sub">Classroom emotional health overview</div>
+        </div>
+        <div class="hero-date" id="hero-date">—</div>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat">
+          <div class="hstat-num" id="h-total">—</div>
+          <div class="hstat-lbl">Total Logs</div>
+        </div>
+        <div class="hstat-div"></div>
+        <div class="hstat">
+          <div class="hstat-num" id="h-happy">—</div>
+          <div class="hstat-lbl">Happy</div>
+        </div>
+        <div class="hstat-div"></div>
+        <div class="hstat">
+          <div class="hstat-num" id="h-negative">—</div>
+          <div class="hstat-lbl">Negative</div>
+        </div>
+        <div class="hstat-div"></div>
+        <div class="hstat">
+          <div class="hstat-num" id="h-alerts">—</div>
+          <div class="hstat-lbl">Alerts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CECI Card -->
+    <div class="ceci-card card-hover">
+      <div class="ceci-glow"></div>
+      <div class="ceci-top">
+        <div class="ceci-label">Classroom Emotional Climate Index — CECI</div>
+        <div class="ceci-badge" id="ceci-badge">—</div>
+      </div>
+      <div class="ceci-row">
+        <div class="ceci-num" id="ceci-score">—</div>
+        <div class="ceci-right">
+          <div class="ceci-sub">Score out of 100</div>
+          <div class="bar-bg">
+            <div class="bar-fill" id="ceci-bar" style="width:0%"></div>
+          </div>
+          <div class="ceci-status" id="ceci-status">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="section-title">Analytics</div>
+    <div class="grid-2">
+      <div class="chart-card card-hover">
+        <div class="chart-h">Emotion Distribution</div>
+        <div class="donut-wrap">
+          <div style="position:relative;width:120px;height:120px;flex-shrink:0">
+            <canvas id="emotionChart" width="120" height="120"></canvas>
+          </div>
+          <div class="legend" id="emotion-legend"></div>
+        </div>
+      </div>
+      <div class="chart-card card-hover">
+        <div class="chart-h">Subject Stress Index</div>
+        <div class="sbars" id="subject-bars"></div>
+      </div>
+    </div>
+
+    <!-- Insights -->
+    <div class="section-title">Insights</div>
+    <div class="grid-2">
+      <div class="bot-card card-hover">
+        <div class="bot-h">Recommendations & Predictions</div>
+        <div id="recommendations-list"></div>
+        <div id="predictions-list"></div>
+      </div>
+      <div class="bot-card card-hover">
+        <div class="bot-h">Active Alerts</div>
+        <div id="alerts-list"></div>
+      </div>
+    </div>
+
+    <!-- Camera Panel -->
+    <div class="section-title">Live Camera</div>
+    <div class="chart-card card-hover" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="chart-h" style="margin:0">🎥 Emotion Detector</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="detector-status" style="font-size:10px;font-weight:500;color:#5eead4;letter-spacing:0.5px">● Offline</div>
+          <button id="camera-btn" onclick="toggleCamera()"
+            style="background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border:none;border-radius:20px;padding:8px 20px;font-size:11px;font-weight:500;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 12px rgba(13,148,136,0.3)">
+            Start Camera
+          </button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+        <!-- Camera Preview -->
+        <div style="position:relative">
+          <div id="camera-placeholder" style="background:#f0fdfa;border:2px dashed #99f6e4;border-radius:16px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:40px">📷</div>
+            <div style="font-size:12px;color:#5eead4;font-weight:400;letter-spacing:0.3px">Click Start Camera to begin</div>
+          </div>
+          <video id="camera-feed" autoplay muted playsinline
+            style="display:none;width:100%;border-radius:16px;border:2px solid #99f6e4;background:#000"></video>
+          <canvas id="camera-canvas" style="display:none"></canvas>
+        </div>
+        <!-- Detection Info -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:#f0fdfa;border:1px solid #e0f5f5;border-radius:16px;padding:16px;text-align:center">
+            <div style="font-size:9px;color:#5eead4;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Current Emotion</div>
+            <div id="current-emotion-emoji" style="font-size:40px;margin-bottom:6px">😐</div>
+            <div id="current-emotion-label" style="font-family:'DM Serif Display',serif;font-size:18px;color:#0f4f4f;font-style:italic">Waiting...</div>
+          </div>
+          <div style="background:#f0fdfa;border:1px solid #e0f5f5;border-radius:16px;padding:14px">
+            <div style="font-size:9px;color:#5eead4;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Session Info</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:#9ca3af">Student ID</span>
+                <span style="color:#0f4f4f;font-weight:500" id="info-student">1</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:#9ca3af">Subject</span>
+                <span style="color:#0f4f4f;font-weight:500" id="info-subject">Math</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:#9ca3af">Detections</span>
+                <span style="color:#0f4f4f;font-weight:500" id="info-count">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:#9ca3af">Last Sent</span>
+                <span style="color:#0f4f4f;font-weight:500" id="info-last">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Parent Notification -->
+    <div class="section-title">Parent Notification</div>
+    <div class="chart-card card-hover" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="chart-h" style="margin:0">📢 Send Manual Notification to Parent</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end">
+        <div>
+          <label style="font-size:9px;color:#5eead4;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px">Student</label>
+          <select id="notif-student" style="width:100%;background:#f0fdfa;border:1px solid #99f6e4;border-radius:12px;padding:9px 14px;font-size:12px;color:#0f4f4f;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer">
+            <option value="">Select student...</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9px;color:#5eead4;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px">Subject</label>
+          <select id="notif-subject" style="width:100%;background:#f0fdfa;border:1px solid #99f6e4;border-radius:12px;padding:9px 14px;font-size:12px;color:#0f4f4f;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer">
+            <option value="Math">Math</option>
+            <option value="Science">Science</option>
+            <option value="English">English</option>
+            <option value="History">History</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:9px;color:#5eead4;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px">Reason</label>
+          <select id="notif-reason" style="width:100%;background:#f0fdfa;border:1px solid #99f6e4;border-radius:12px;padding:9px 14px;font-size:12px;color:#0f4f4f;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer">
+            <option value="angry">😠 High Frustration</option>
+            <option value="sad">😢 Appears Sad</option>
+            <option value="fearful">😨 Appears Anxious</option>
+            <option value="neutral">😐 Disengaged</option>
+          </select>
+        </div>
+        <button onclick="sendManualNotification()"
+          style="background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border:none;border-radius:12px;padding:10px 20px;font-size:12px;font-weight:500;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 12px rgba(13,148,136,0.3);white-space:nowrap">
+          Send Notification
+        </button>
+      </div>
+      <div id="notif-feedback" style="margin-top:12px;display:none"></div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="section-title">Recent Activity</div>
+    <div class="tbl-card">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Emotion</th>
+            <th>Subject</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="logs-table"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+<script>
+const EMOTION_COLORS = {
+  happy:     { bg: '#d1fae5', text: '#065f46' },
+  sad:       { bg: '#dbeafe', text: '#1e40af' },
+  angry:     { bg: '#fee2e2', text: '#991b1b' },
+  neutral:   { bg: '#f1f5f9', text: '#475569' },
+  surprised: { bg: '#fef9c3', text: '#713f12' },
+  fearful:   { bg: '#ede9fe', text: '#4c1d95' },
+  disgusted: { bg: '#d1fae5', text: '#064e3b' },
+};
+const EMOTION_EMOJI = { happy:'😊', sad:'😢', angry:'😠', neutral:'😐', surprised:'😲', fearful:'😨', disgusted:'🤢' };
+const CHART_COLORS = ['#ef4444','#f59e0b','#14b8a6','#94a3b8','#0d9488','#10b981','#f97316'];
+const AVATAR_COLORS = [
+  { bg:'#f0fdfa', text:'#0d9488' },
+  { bg:'#fff7ed', text:'#c2410c' },
+  { bg:'#eff6ff', text:'#1d4ed8' },
+  { bg:'#fdf4ff', text:'#7e22ce' },
+  { bg:'#fef9c3', text:'#713f12' },
+];
+const CECI_STYLES = {
+  green:  { bar:'linear-gradient(90deg,#0d9488,#2dd4bf)', badge:'background:#f0fdfa;color:#0d9488;border-color:#99f6e4', status:'color:#0d9488' },
+  yellow: { bar:'linear-gradient(90deg,#f59e0b,#fbbf24)', badge:'background:#fff8dc;color:#d97706;border-color:#fde68a', status:'color:#d97706' },
+  red:    { bar:'linear-gradient(90deg,#ef4444,#f87171)', badge:'background:#fff5f5;color:#991b1b;border-color:#fecaca', status:'color:#991b1b' },
+};
+
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+let emotionChart;
+
+function getInitials(name) {
+  return name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+}
+
+function getAvatarColor(name) {
+  const idx = name.charCodeAt(0) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[idx];
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString('en-IN', { hour:'2-digit', minute:'2-digit', day:'numeric', month:'short' });
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('current-time').textContent =
+    now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+function updateDate() {
+  const now = new Date();
+  document.getElementById('hero-date').textContent =
+    `${DAYS[now.getDay()]} · ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+}
+
+async function loadDashboard() {
+  const [dash, alerts] = await Promise.all([
+    fetch('/api/dashboard/').then(r => r.json()),
+    fetch('/api/alerts/').then(r => r.json())
+  ]);
+
+  // Hero stats
+  document.getElementById('h-total').textContent = dash.total_logs;
+  const happy = dash.emotion_counts.find(e => e.emotion === 'happy')?.count || 0;
+  const negative = dash.emotion_counts
+    .filter(e => ['sad','angry','fearful','disgusted'].includes(e.emotion))
+    .reduce((a, b) => a + b.count, 0);
+  document.getElementById('h-happy').textContent = happy;
+  document.getElementById('h-negative').textContent = negative;
+  document.getElementById('h-alerts').textContent = alerts.length;
+
+  // CECI
+  const cs = CECI_STYLES[dash.ceci_color] || CECI_STYLES.yellow;
+  document.getElementById('ceci-score').textContent = dash.ceci_score;
+  document.getElementById('ceci-bar').style.background = cs.bar;
+  document.getElementById('ceci-bar').style.width = dash.ceci_score + '%';
+  document.getElementById('ceci-badge').style.cssText = cs.badge;
+  document.getElementById('ceci-badge').textContent = dash.ceci_status;
+  document.getElementById('ceci-status').style.cssText = cs.status;
+  const ceciMessages = {
+    green: 'Excellent! Students are emotionally engaged.',
+    yellow: 'Moderate — Try interactive activities to boost engagement.',
+    red: 'Warning — Immediate intervention recommended.'
+  };
+  document.getElementById('ceci-status').textContent = ceciMessages[dash.ceci_color] || '';
+
+  // Emotion Donut Chart
+  const labels = dash.emotion_counts.map(e => e.emotion);
+  const data   = dash.emotion_counts.map(e => e.count);
+  if (emotionChart) emotionChart.destroy();
+  emotionChart = new Chart(document.getElementById('emotionChart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: CHART_COLORS, borderWidth: 0, hoverOffset: 4 }] },
+    options: {
+      responsive: false,
+      plugins: { legend: { display: false } },
+      cutout: '68%'
+    }
+  });
+
+  // Legend
+  const legendEl = document.getElementById('emotion-legend');
+  const total = data.reduce((a,b) => a+b, 0);
+  legendEl.innerHTML = labels.map((lbl, i) => `
+    <div class="leg">
+      <div class="leg-dot" style="background:${CHART_COLORS[i]}"></div>
+      ${lbl} · ${total > 0 ? Math.round(data[i]/total*100) : 0}%
+    </div>`).join('');
+
+  // Subject stress bars
+  const subjects = [...new Set(dash.subject_emotions.map(s => s.subject))];
+  const negEmotions = ['sad','angry','fearful','disgusted'];
+  const barsEl = document.getElementById('subject-bars');
+  barsEl.innerHTML = subjects.map(sub => {
+    const neg = dash.subject_emotions.filter(s => s.subject===sub && negEmotions.includes(s.emotion)).reduce((a,b)=>a+b.count,0);
+    const tot = dash.subject_emotions.filter(s => s.subject===sub).reduce((a,b)=>a+b.count,0);
+    const pct = tot > 0 ? Math.round(neg/tot*100) : 0;
+    const color = pct >= 60 ? 'linear-gradient(90deg,#ef4444,#f87171)' :
+                  pct >= 30 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)' :
+                              'linear-gradient(90deg,#0d9488,#14b8a6)';
+    return `
+      <div class="sbar-row">
+        <div class="sbar-lbl">${sub}</div>
+        <div class="sbar-track">
+          <div class="sbar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="sbar-val">${pct}%</div>
+      </div>`;
+  }).join('');
+
+  // Recommendations
+  const recEl = document.getElementById('recommendations-list');
+  recEl.innerHTML = dash.recommendations.length
+    ? dash.recommendations.map(r => `<div class="reco-item">${r}</div>`).join('')
+    : `<div class="empty"><p>No recommendations right now</p></div>`;
+
+  // Predictions
+  const predEl = document.getElementById('predictions-list');
+  predEl.innerHTML = dash.predictions && dash.predictions.length
+    ? `<div class="pred-lbl">🔮 Predictions</div>` +
+      dash.predictions.map(r => `<div class="pred-item">${r}</div>`).join('')
+    : `<div style="font-size:11px;color:#5eead4;text-align:center;padding:8px 0;letter-spacing:0.3px">✅ No risk patterns detected</div>`;
+
+  // Alerts
+  const alertEl = document.getElementById('alerts-list');
+  alertEl.innerHTML = alerts.length
+    ? alerts.map(a => `
+        <div class="alert-item">
+          <div class="alert-name">${a.student_name}</div>
+          <div class="alert-msg">${a.message}</div>
+          <div class="alert-time">${formatTime(a.created_at)}</div>
+        </div>`).join('')
+    : `<div class="empty">
+        <div class="empty-icon">✅</div>
+        <p>All clear · No alerts right now</p>
+      </div>`;
+
+  // Recent Logs Table
+  const tbody = document.getElementById('logs-table');
+  tbody.innerHTML = dash.recent_logs.map(l => {
+    const av = getAvatarColor(l.student_name);
+    const ec = EMOTION_COLORS[l.emotion] || EMOTION_COLORS.neutral;
+    return `
+      <tr>
+        <td>
+          <span class="avatar" style="background:${av.bg};color:${av.text}">${getInitials(l.student_name)}</span>
+          ${l.student_name}
+        </td>
+        <td><span class="ebadge" style="background:${ec.bg};color:${ec.text}">${EMOTION_EMOJI[l.emotion]||'😐'} ${l.emotion}</span></td>
+        <td>${l.subject}</td>
+        <td style="color:#9ca3af">${formatTime(l.timestamp)}</td>
+      </tr>`;
+  }).join('');
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+updateDate();
+loadDashboard();
+setInterval(loadDashboard, 30000);
+// ── Camera Panel ────────────────────────────────────────────────
+let cameraRunning = false;
+let detectionCount = 0;
+const STUDENT_ID = 1;
+const SUBJECT = 'Math';
+const EMOTION_EMOJI_MAP = { happy:'😊', sad:'😢', angry:'😠', neutral:'😐', surprised:'😲', fearful:'😨', disgusted:'🤢' };
+
+async function toggleCamera() {
+  if (!cameraRunning) {
+    await startCamera();
+  } else {
+    stopCamera();
+  }
+}
+
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const video = document.getElementById('camera-feed');
+    const placeholder = document.getElementById('camera-placeholder');
+    video.srcObject = stream;
+    video.style.display = 'block';
+    placeholder.style.display = 'none';
+    cameraRunning = true;
+
+    document.getElementById('camera-btn').textContent = 'Stop Camera';
+    document.getElementById('camera-btn').style.background = 'linear-gradient(135deg,#ef4444,#f87171)';
+    document.getElementById('detector-status').textContent = '● Live';
+    document.getElementById('detector-status').style.color = '#0d9488';
+
+    // Also start backend detector
+    await fetch('/api/detector/control/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'start' })
+    });
+
+    // Poll latest emotion every 3 seconds
+    window._emotionPoll = setInterval(updateEmotionDisplay, 3000);
+
+  } catch (err) {
+    alert('Could not access webcam. Please allow camera permission.');
+  }
+}
+
+function stopCamera() {
+  const video = document.getElementById('camera-feed');
+  const placeholder = document.getElementById('camera-placeholder');
+
+  if (video.srcObject) {
+    video.srcObject.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+  }
+
+  video.style.display = 'none';
+  placeholder.style.display = 'flex';
+  cameraRunning = false;
+
+  document.getElementById('camera-btn').textContent = 'Start Camera';
+  document.getElementById('camera-btn').style.background = 'linear-gradient(135deg,#0d9488,#14b8a6)';
+  document.getElementById('detector-status').textContent = '● Offline';
+  document.getElementById('detector-status').style.color = '#5eead4';
+  document.getElementById('current-emotion-label').textContent = 'Waiting...';
+  document.getElementById('current-emotion-emoji').textContent = '😐';
+
+  // Stop backend detector
+  fetch('/api/detector/control/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'stop' })
+  });
+
+  if (window._emotionPoll) clearInterval(window._emotionPoll);
+}
+
+async function updateEmotionDisplay() {
+  try {
+    const res = await fetch('/api/emotions/');
+    const logs = await res.json();
+    if (logs.length > 0) {
+      const latest = logs[0];
+      const emoji = EMOTION_EMOJI_MAP[latest.emotion] || '😐';
+      document.getElementById('current-emotion-emoji').textContent = emoji;
+      document.getElementById('current-emotion-label').textContent = latest.emotion;
+      document.getElementById('info-student').textContent = latest.student_name;
+      document.getElementById('info-subject').textContent = latest.subject;
+      detectionCount++;
+      document.getElementById('info-count').textContent = detectionCount;
+      document.getElementById('info-last').textContent = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    }
+  } catch(e) {}
+}
+// ────────────────────────────────────────────────────────────────
+
+// ── Manual Notification ─────────────────────────────────────────
+async function loadStudents() {
+  const res = await fetch('/api/students/');
+  const students = await res.json();
+  const select = document.getElementById('notif-student');
+  students.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.name} (${s.class_name})`;
+    select.appendChild(opt);
+  });
+}
+
+async function sendManualNotification() {
+  const studentId = document.getElementById('notif-student').value;
+  const subject   = document.getElementById('notif-subject').value;
+  const reason    = document.getElementById('notif-reason').value;
+  const feedback  = document.getElementById('notif-feedback');
+
+  if (!studentId) {
+    feedback.style.display = 'block';
+    feedback.innerHTML = `<div style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:10px 14px;font-size:12px;color:#991b1b">⚠️ Please select a student first.</div>`;
+    return;
+  }
+
+  const reasonMessages = {
+    angry:   'showing signs of frustration and anger',
+    sad:     'appearing sad and emotionally low',
+    fearful: 'appearing anxious and fearful',
+    neutral: 'being disengaged and emotionally withdrawn',
+  };
+
+  const studentName = document.getElementById('notif-student').selectedOptions[0].text.split(' (')[0];
+  const message = `Dear Parent, your child ${studentName} has been ${reasonMessages[reason]} during ${subject} class today. We recommend checking in with them at home to offer emotional support.`;
+
+  try {
+    const res = await fetch('/api/notify-parent/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        student_id: studentId,
+        subject: subject,
+        emotion: reason,
+        message: message
+      })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      feedback.style.display = 'block';
+      feedback.innerHTML = `
+        <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:12px;padding:10px 14px;font-size:12px;color:#0d9488;display:flex;align-items:center;gap:8px">
+          ✅ Notification sent to <strong>${data.student}</strong>'s parent successfully!
+          <a href="/parents/" style="color:#0d9488;font-weight:500;margin-left:auto;text-decoration:underline">View in Parent Portal →</a>
+        </div>`;
+      // Reset
+      document.getElementById('notif-student').value = '';
+      setTimeout(() => { feedback.style.display = 'none'; }, 5000);
+    }
+  } catch(e) {
+    feedback.style.display = 'block';
+    feedback.innerHTML = `<div style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:10px 14px;font-size:12px;color:#991b1b">❌ Failed to send notification. Try again.</div>`;
+  }
+}
+
+// Load students on page load
+loadStudents();
+// ────────────────────────────────────────────────────────────────
+</script>
+</body>
+</html>
