@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "SERS Dashboard"
+version = "1.0.0"
+id = "artifacts/sers-dashboard"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24012
+
+[services.development]
+run = "pnpm --filter @workspace/sers-dashboard run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sers-dashboard", "run", "build" ]
+publicDir = "artifacts/sers-dashboard/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24012"
+BASE_PATH = "/"

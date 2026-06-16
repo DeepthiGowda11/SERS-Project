@@ -1,0 +1,718 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: SERS - System for Emotional Response and Analysis API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: classrooms
+    description: Classroom management
+  - name: students
+    description: Student management
+  - name: sessions
+    description: Classroom session management
+  - name: emotions
+    description: Emotion record management
+  - name: notifications
+    description: Parent notification management
+  - name: coaching
+    description: Teacher coaching suggestions
+  - name: dashboard
+    description: Dashboard aggregates
+  - name: parent
+    description: Parent portal (public, token-based)
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /classrooms:
+    get:
+      operationId: listClassrooms
+      tags: [classrooms]
+      summary: List all classrooms
+      responses:
+        "200":
+          description: List of classrooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Classroom"
+    post:
+      operationId: createClassroom
+      tags: [classrooms]
+      summary: Create a classroom
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassroomInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Classroom"
+
+  /classrooms/{id}:
+    get:
+      operationId: getClassroom
+      tags: [classrooms]
+      summary: Get a classroom by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Classroom
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Classroom"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /classrooms/{id}/students:
+    get:
+      operationId: listClassroomStudents
+      tags: [classrooms]
+      summary: List students in a classroom
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+
+  /classrooms/{id}/sessions:
+    get:
+      operationId: listClassroomSessions
+      tags: [classrooms]
+      summary: List sessions for a classroom
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+    post:
+      operationId: createSession
+      tags: [sessions]
+      summary: Start a new session for a classroom
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /classrooms/{id}/dashboard:
+    get:
+      operationId: getClassroomDashboard
+      tags: [dashboard]
+      summary: Get live emotion dashboard for a classroom
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Classroom dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassroomDashboard"
+
+  /students:
+    post:
+      operationId: createStudent
+      tags: [students]
+      summary: Create a student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+
+  /students/{id}:
+    get:
+      operationId: getStudent
+      tags: [students]
+      summary: Get a student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /students/{id}/trends:
+    get:
+      operationId: getStudentTrends
+      tags: [students]
+      summary: Get emotion trends for a student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Student trends
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentTrends"
+
+  /sessions/{id}:
+    get:
+      operationId: getSession
+      tags: [sessions]
+      summary: Get a session by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateSession
+      tags: [sessions]
+      summary: Update a session (end it)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionUpdate"
+      responses:
+        "200":
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /sessions/{id}/records:
+    get:
+      operationId: listSessionRecords
+      tags: [sessions]
+      summary: List emotion records for a session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Emotion records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmotionRecord"
+
+  /emotion-records:
+    post:
+      operationId: createEmotionRecord
+      tags: [emotions]
+      summary: Log an emotion record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmotionRecordInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmotionRecord"
+
+  /parent-notifications:
+    get:
+      operationId: listParentNotifications
+      tags: [notifications]
+      summary: List parent notifications
+      parameters:
+        - name: studentId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ParentNotification"
+    post:
+      operationId: createParentNotification
+      tags: [notifications]
+      summary: Send a parent notification (logs it and emails the parent)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParentNotificationInput"
+      responses:
+        "201":
+          description: Notification created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParentNotification"
+
+  /parent/{token}:
+    get:
+      operationId: getParentPortal
+      tags: [parent]
+      summary: Get parent portal data by token (public, no auth)
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Parent portal data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParentPortal"
+        "404":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /coaching-suggestions:
+    get:
+      operationId: listCoachingSuggestions
+      tags: [coaching]
+      summary: List coaching suggestions
+      parameters:
+        - name: emotion
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoachingSuggestion"
+
+  /overview:
+    get:
+      operationId: getOverview
+      tags: [dashboard]
+      summary: Get system-wide overview statistics
+      responses:
+        "200":
+          description: Overview statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Overview"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    Classroom:
+      type: object
+      required: [id, name, teacherName, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        teacherName:
+          type: string
+        createdAt:
+          type: string
+
+    ClassroomInput:
+      type: object
+      required: [name, teacherName]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        teacherName:
+          type: string
+          minLength: 1
+
+    Student:
+      type: object
+      required: [id, classroomId, name, createdAt]
+      properties:
+        id:
+          type: integer
+        classroomId:
+          type: integer
+        name:
+          type: string
+        studentCode:
+          type: ["string", "null"]
+        parentEmail:
+          type: ["string", "null"]
+        parentToken:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    StudentInput:
+      type: object
+      required: [classroomId, name]
+      properties:
+        classroomId:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+        studentCode:
+          type: string
+        parentEmail:
+          type: string
+
+    Session:
+      type: object
+      required: [id, classroomId, startTime, isActive]
+      properties:
+        id:
+          type: integer
+        classroomId:
+          type: integer
+        startTime:
+          type: string
+        endTime:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+
+    SessionUpdate:
+      type: object
+      properties:
+        isActive:
+          type: boolean
+        endTime:
+          type: string
+
+    EmotionRecord:
+      type: object
+      required: [id, studentId, sessionId, emotion, alertLevel, recordedAt]
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        sessionId:
+          type: integer
+        emotion:
+          type: string
+        alertLevel:
+          type: string
+          description: "green | yellow | red"
+        confidence:
+          type: ["number", "null"]
+        recordedAt:
+          type: string
+
+    EmotionRecordInput:
+      type: object
+      required: [studentId, sessionId, emotion, alertLevel]
+      properties:
+        studentId:
+          type: integer
+        sessionId:
+          type: integer
+        emotion:
+          type: string
+        alertLevel:
+          type: string
+        confidence:
+          type: number
+
+    StudentTrends:
+      type: object
+      required: [studentId, emotionCounts, recentRecords]
+      properties:
+        studentId:
+          type: integer
+        emotionCounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmotionCount"
+        recentRecords:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmotionRecord"
+        dominantEmotion:
+          type: ["string", "null"]
+        alertLevel:
+          type: ["string", "null"]
+
+    EmotionCount:
+      type: object
+      required: [emotion, count, alertLevel]
+      properties:
+        emotion:
+          type: string
+        count:
+          type: integer
+        alertLevel:
+          type: string
+
+    ClassroomDashboard:
+      type: object
+      required: [classroomId, studentStates, emotionSummary, activeSession]
+      properties:
+        classroomId:
+          type: integer
+        activeSession:
+          $ref: "#/components/schemas/Session"
+        studentStates:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentState"
+        emotionSummary:
+          $ref: "#/components/schemas/EmotionSummary"
+
+    StudentState:
+      type: object
+      required: [student, latestEmotion, alertLevel]
+      properties:
+        student:
+          $ref: "#/components/schemas/Student"
+        latestEmotion:
+          type: ["string", "null"]
+        alertLevel:
+          type: ["string", "null"]
+        lastUpdated:
+          type: ["string", "null"]
+
+    EmotionSummary:
+      type: object
+      required: [green, yellow, red, total]
+      properties:
+        green:
+          type: integer
+        yellow:
+          type: integer
+        red:
+          type: integer
+        total:
+          type: integer
+
+    ParentNotification:
+      type: object
+      required: [id, studentId, message, emotion, emailSent, sentAt]
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        message:
+          type: string
+        emotion:
+          type: string
+        emailSent:
+          type: boolean
+        emailAddress:
+          type: ["string", "null"]
+        sentAt:
+          type: string
+
+    ParentNotificationInput:
+      type: object
+      required: [studentId, message, emotion]
+      properties:
+        studentId:
+          type: integer
+        message:
+          type: string
+          minLength: 1
+        emotion:
+          type: string
+
+    ParentPortal:
+      type: object
+      required: [student, recentRecords, notifications, emotionCounts]
+      properties:
+        student:
+          type: object
+          required: [id, name]
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            parentEmail:
+              type: ["string", "null"]
+        recentRecords:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmotionRecord"
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParentNotification"
+        emotionCounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmotionCount"
+        dominantEmotion:
+          type: ["string", "null"]
+        alertLevel:
+          type: ["string", "null"]
+
+    CoachingSuggestion:
+      type: object
+      required: [id, emotion, suggestion, strategy]
+      properties:
+        id:
+          type: integer
+        emotion:
+          type: string
+        suggestion:
+          type: string
+        strategy:
+          type: string
+
+    Overview:
+      type: object
+      required: [totalClassrooms, totalStudents, activeSessions, todayRecords, alertCounts]
+      properties:
+        totalClassrooms:
+          type: integer
+        totalStudents:
+          type: integer
+        activeSessions:
+          type: integer
+        todayRecords:
+          type: integer
+        alertCounts:
+          $ref: "#/components/schemas/EmotionSummary"
